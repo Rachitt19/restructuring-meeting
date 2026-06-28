@@ -4,6 +4,7 @@ const TOTAL_SLIDES = 14
 
 export function useSlideNavigation() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [direction, setDirection] = useState(1)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showCounter, setShowCounter] = useState(false)
@@ -15,6 +16,7 @@ export function useSlideNavigation() {
     if (index < 0 || index >= TOTAL_SLIDES) return
     if (index === currentSlide) return
 
+    setDirection(index > currentSlide ? 1 : -1)
     setIsTransitioning(true)
     setCurrentSlide(index)
 
@@ -122,5 +124,6 @@ export function useSlideNavigation() {
     goToSlide,
     toggleFullscreen,
     progress: ((currentSlide + 1) / TOTAL_SLIDES) * 100,
+    direction
   }
 }

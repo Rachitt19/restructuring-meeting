@@ -68,6 +68,7 @@ export default function SlidePrinciples({ isActive }) {
           {principles.map((p, i) => (
             <GlassCard
               key={i}
+              layoutId={`morph-card-${i < 3 ? 'ops' : 'acad'}-${i % 3}`}
               className="p-7 group cursor-default"
               delay={0.8 + i * 0.12}
               hoverGlow

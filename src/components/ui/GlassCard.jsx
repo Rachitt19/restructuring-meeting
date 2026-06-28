@@ -11,11 +11,13 @@ export default function GlassCard({
   delay = 0,
   style = {},
   onClick,
+  layoutId,
 }) {
   const baseClass = purple ? 'glass-card-purple' : 'glass-card'
 
   return (
     <motion.div
+      layoutId={layoutId}
       className={`${baseClass} ${className}`}
       initial={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
       animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}

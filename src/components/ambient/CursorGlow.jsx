@@ -43,13 +43,25 @@ export default function CursorGlow() {
       <div
         style={{
           position: 'absolute',
-          left: position.x - 300,
-          top: position.y - 300,
-          width: 600,
-          height: 600,
+          left: position.x - 400,
+          top: position.y - 400,
+          width: 800,
+          height: 800,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(181,90,199,0.04) 0%, transparent 70%)',
-          willChange: 'transform',
+          background: 'radial-gradient(circle, rgba(181,90,199,0.06) 0%, rgba(141,74,232,0.02) 40%, transparent 70%)',
+          willChange: 'transform, left, top',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: position.x - 150,
+          top: position.y - 150,
+          width: 300,
+          height: 300,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%)',
+          willChange: 'transform, left, top',
         }}
       />
     </div>

@@ -57,7 +57,7 @@ export default function SlideResearch({ isActive }) {
         </AnimatedHeadline>
 
         {/* Pipeline diagram */}
-        <div className="flex flex-col items-center gap-0 mb-12">
+        <motion.div layoutId="pipeline-container" className="flex flex-col items-center gap-0 mb-12">
           {/* Top row */}
           <div className="flex items-center gap-0">
             {topRow.map((stage, i) => (
@@ -108,7 +108,7 @@ export default function SlideResearch({ isActive }) {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Closing statement */}
         <motion.p

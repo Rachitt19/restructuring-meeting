@@ -36,6 +36,7 @@ export default function SlideAccountability({ isActive }) {
 
         {/* Pipeline container */}
         <motion.div
+          layoutId="pipeline-container"
           className="glass-card p-10 mx-auto mb-12"
           style={{ maxWidth: '85%' }}
           initial={{ opacity: 0, borderColor: 'rgba(255,255,255,0)' }}

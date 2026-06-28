@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { useSlideNavigation } from './hooks/useSlideNavigation.js'
 
 import ParticleCanvas from './components/ambient/ParticleCanvas.jsx'
@@ -47,22 +47,21 @@ export default function App() {
     totalSlides,
     showCounter,
     progress,
+    direction // Need this for direction-aware transitions
   } = useSlideNavigation()
 
   const handleLoadComplete = useCallback(() => {
     setIsLoaded(true)
   }, [])
 
-  // Determine particle density/opacity per slide
-  const particleDensity = currentSlide === 12 ? 1.5 : 1 // Vision slide = denser
-  const particleOpacity = currentSlide === 0 ? 0.6 : 1 // Welcome = dimmer initially
+  // Dynamic ambient layer controls
+  const particleDensity = currentSlide === 12 ? 1.5 : 1
+  const particleOpacity = currentSlide === 0 ? 0.6 : 1
 
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: '#050505' }}>
-      {/* Loading screen */}
       {!isLoaded && <LoadingScreen onComplete={handleLoadComplete} />}
 
-      {/* Ambient layers (always present) */}
       {isLoaded && (
         <>
           <ParticleCanvas
@@ -74,47 +73,66 @@ export default function App() {
         </>
       )}
 
-      {/* Slide content */}
       {isLoaded && (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            className="absolute inset-0"
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
-            transition={{
-              enter: { duration: 0.8, ease: appleEase },
-              exit: { duration: 0.6, ease: appleEase },
-              duration: 0.8,
-              ease: appleEase,
-            }}
-          >
-            {slides.map((SlideComponent, index) => (
-              <SlideComponent
-                key={index}
-                isActive={index === currentSlide}
-              />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+        <LayoutGroup>
+          <AnimatePresence mode="popLayout" custom={direction}>
+            <motion.div
+              key={currentSlide}
+              custom={direction}
+              className="absolute inset-0 w-full h-full flex items-center justify-center"
+              initial={(dir) => ({ 
+                opacity: 0, 
+                scale: dir > 0 ? 0.95 : 1.05, 
+                z: dir > 0 ? -100 : 100,
+                filter: 'blur(12px)'
+              })}
+              animate={{ 
+                opacity: 1, 
+                scale: 1, 
+                z: 0,
+                filter: 'blur(0px)'
+              }}
+              exit={(dir) => ({ 
+                opacity: 0, 
+                scale: dir > 0 ? 1.05 : 0.95,
+                z: dir > 0 ? 100 : -100,
+                filter: 'blur(12px)'
+              })}
+              transition={{
+                duration: 1.2,
+                ease: appleEase,
+              }}
+              style={{
+                perspective: '1000px',
+                transformStyle: 'preserve-3d'
+              }}
+            >
+              {slides.map((SlideComponent, index) => (
+                <SlideComponent
+                  key={index}
+                  isActive={index === currentSlide}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </LayoutGroup>
       )}
 
-      {/* Progress bar */}
       {isLoaded && (
         <div className="progress-bar">
-          <div
+          <motion.div
             className="progress-bar-fill"
-            style={{ width: `${progress}%` }}
+            layoutId="global-progress"
+            animate={{ width: `${progress}%` }}
+            transition={{ ease: appleEase, duration: 0.8 }}
           />
         </div>
       )}
 
-      {/* Slide counter */}
       {isLoaded && (
         <div
           className="slide-counter"
-          style={{ opacity: showCounter ? 1 : 0 }}
+          style={{ opacity: showCounter ? 1 : 0, transition: 'opacity 0.6s ease' }}
         >
           {String(currentSlide + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
         </div>

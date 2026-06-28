@@ -91,6 +91,7 @@ export default function SlideAcademic({ isActive }) {
         <AnimatedLabel text="PILLAR 02" />
 
         <motion.h2
+          layoutId="node-acad-pillar"
           className="font-space font-bold text-[72px] leading-none mb-3"
           initial={{ opacity: 0, filter: 'blur(12px)' }}
           animate={{ opacity: 1, filter: 'blur(0px)' }}
@@ -120,6 +121,7 @@ export default function SlideAcademic({ isActive }) {
           {departments.map((dept, i) => (
             <GlassCard
               key={i}
+              layoutId={`dept-card-${i}`}
               className="p-6 w-[300px] relative overflow-hidden group"
               delay={0.9 + i * 0.15}
               hoverGlow

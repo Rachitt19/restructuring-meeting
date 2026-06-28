@@ -58,6 +58,7 @@ export default function SlideRoadmap({ isActive }) {
 
         {/* Timeline container */}
         <motion.div
+          layoutId="pipeline-container"
           className="glass-card overflow-hidden mx-auto mb-12"
           style={{ maxWidth: '90%' }}
           initial={{ opacity: 0 }}
