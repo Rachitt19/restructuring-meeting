@@ -8,6 +8,19 @@ const slowAppleEase = [0.16, 1, 0.2, 1]
 const opsSubTeams = ['Events & Logistics', 'Design & Media', 'Community & Outreach']
 const acadSubTeams = ['Learning Tracks', 'Research Groups', 'Projects & Publications']
 
+// Executive node positions (diamond layout)
+const PRESIDENT = { x: 450, y: 30 }
+const VP_OPS = { x: 200, y: 140 }
+const ACAD_DIR = { x: 700, y: 140 }
+const SECRETARY = { x: 450, y: 210 }
+
+// Secretary connection endpoints
+const secConnections = [
+  { from: SECRETARY, to: PRESIDENT, color: '#B55AC7', label: 'sec-pres' },
+  { from: SECRETARY, to: VP_OPS, color: '#A3A3A3', label: 'sec-vp' },
+  { from: SECRETARY, to: ACAD_DIR, color: '#8D4AE8', label: 'sec-acad' },
+]
+
 export default function SlideArchitecture({ isActive }) {
   const [phase, setPhase] = useState(0)
   const [hoveredNode, setHoveredNode] = useState(null)
@@ -33,6 +46,7 @@ export default function SlideArchitecture({ isActive }) {
 
   const isOpsHovered = hoveredNode === 'ops' || (hoveredNode && hoveredNode.startsWith('ops-'))
   const isAcadHovered = hoveredNode === 'acad' || (hoveredNode && hoveredNode.startsWith('acad-'))
+  const isSecHovered = hoveredNode === 'sec'
 
   return (
     <div className="slide">
@@ -74,7 +88,7 @@ export default function SlideArchitecture({ isActive }) {
       <div className="slide-content relative z-10">
         <AnimatedLabel text="THE NEW STRUCTURE" />
 
-        <div className="h-[90px] mb-6">
+        <div className="h-[90px] mb-4">
           <AnimatePresence mode="wait">
             {phase < 3 ? (
               <motion.div
@@ -104,8 +118,9 @@ export default function SlideArchitecture({ isActive }) {
         </div>
 
         {/* Architecture Canvas */}
-        <div className="flex justify-center relative h-[380px] w-[900px] mx-auto">
+        <div className="flex justify-center relative h-[420px] w-[950px] mx-auto">
           
+          {/* PHASE 2: Analysis overlay */}
           <AnimatePresence>
             {phase === 2 && (
               <motion.div
@@ -152,7 +167,9 @@ export default function SlideArchitecture({ isActive }) {
             )}
           </AnimatePresence>
 
-          <svg width="900" height="380" viewBox="0 0 900 380" className="absolute inset-0 z-10 pointer-events-none">
+          {/* SVG CONNECTION LINES */}
+          <svg width="950" height="420" viewBox="0 0 950 420" className="absolute inset-0 z-10 pointer-events-none">
+            {/* PHASE 0-1: Legacy chaotic lines */}
             <AnimatePresence>
               {phase < 2 && (
                 <motion.g
@@ -161,7 +178,6 @@ export default function SlideArchitecture({ isActive }) {
                   exit={{ opacity: 0, filter: 'blur(12px)' }}
                   transition={{ duration: phase === 1 ? 2 : 1.5, ease: slowAppleEase }}
                 >
-                  {/* Chaotic lines */}
                   {[
                     [150, 67, 300, 97], [350, 115, 250, 160], [550, 57, 450, 180],
                     [750, 125, 650, 200], [250, 195, 200, 280], [500, 215, 400, 300],
@@ -188,47 +204,95 @@ export default function SlideArchitecture({ isActive }) {
             <AnimatePresence>
               {phase === 3 && (
                 <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+                  
+                  {/* === EXECUTIVE HIERARCHY LINES === */}
+                  {/* President → VP Operations */}
                   <motion.line
-                    x1={450} y1={70} x2={250} y2={140}
+                    x1={PRESIDENT.x} y1={PRESIDENT.y + 30} x2={VP_OPS.x + 90} y2={VP_OPS.y}
                     stroke="rgba(255,255,255,0.12)" strokeWidth={1.5}
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.8, delay: 0.5, ease: appleEase }}
                     style={{ opacity: isAcadHovered ? 0.04 : isOpsHovered ? 0.25 : 0.12, transition: 'opacity 0.3s' }}
                   />
+                  {/* President → Academic Director */}
                   <motion.line
-                    x1={450} y1={70} x2={650} y2={140}
+                    x1={PRESIDENT.x} y1={PRESIDENT.y + 30} x2={ACAD_DIR.x - 90} y2={ACAD_DIR.y}
                     stroke="rgba(255,255,255,0.12)" strokeWidth={1.5}
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.8, delay: 0.5, ease: appleEase }}
                     style={{ opacity: isOpsHovered ? 0.04 : isAcadHovered ? 0.25 : 0.12, transition: 'opacity 0.3s' }}
                   />
 
-                  {/* Flow dashes */}
+                  {/* === SECRETARY COMMUNICATION CHANNELS (dashed, subtle) === */}
+                  {secConnections.map((conn, i) => {
+                    const fromX = conn.from.x
+                    const fromY = conn.from.y
+                    const toX = conn.to.x
+                    const toY = conn.to.y + (conn.to === PRESIDENT ? 30 : 27)
+                    const pathD = `M ${fromX} ${fromY} L ${toX} ${toY}`
+                    
+                    return (
+                      <motion.g key={`sec-conn-${i}`}>
+                        {/* Base connection line */}
+                        <motion.line
+                          x1={fromX} y1={fromY}
+                          x2={toX} y2={toY}
+                          stroke={conn.color}
+                          strokeWidth={1}
+                          strokeOpacity={0.08}
+                          strokeDasharray="3 6"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.6, delay: 1.0 + i * 0.15, ease: appleEase }}
+                          style={{ opacity: isSecHovered ? 1 : 0.5, transition: 'opacity 0.3s' }}
+                        />
+                        {/* Flowing particle along the line */}
+                        <motion.circle
+                          r={2} fill={conn.color}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.6, 0], offsetDistance: ['0%', '100%'] }}
+                          transition={{ duration: 2.5, delay: 2.0 + i * 0.6, repeat: Infinity, ease: 'linear' }}
+                          style={{ offsetPath: `path("${pathD}")` }}
+                        />
+                        {/* Second particle (return direction) */}
+                        <motion.circle
+                          r={1.5} fill={conn.color}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.4, 0], offsetDistance: ['100%', '0%'] }}
+                          transition={{ duration: 3, delay: 3.0 + i * 0.5, repeat: Infinity, ease: 'linear' }}
+                          style={{ offsetPath: `path("${pathD}")` }}
+                        />
+                      </motion.g>
+                    )
+                  })}
+
+                  {/* === FLOW DASHES on hierarchy lines === */}
                   <motion.line
-                    x1={450} y1={70} x2={250} y2={140}
+                    x1={PRESIDENT.x} y1={PRESIDENT.y + 30} x2={VP_OPS.x + 90} y2={VP_OPS.y}
                     stroke="#B55AC7" strokeWidth={1.5} strokeDasharray="4 16"
                     initial={{ strokeDashoffset: 0, opacity: 0 }}
                     animate={{ strokeDashoffset: -100, opacity: 0.3 }}
                     transition={{ opacity: { delay: 2, duration: 1 }, strokeDashoffset: { duration: 3, repeat: Infinity, ease: 'linear'} }}
                   />
                   <motion.line
-                    x1={450} y1={70} x2={650} y2={140}
+                    x1={PRESIDENT.x} y1={PRESIDENT.y + 30} x2={ACAD_DIR.x - 90} y2={ACAD_DIR.y}
                     stroke="#8D4AE8" strokeWidth={1.5} strokeDasharray="4 16"
                     initial={{ strokeDashoffset: 0, opacity: 0 }}
                     animate={{ strokeDashoffset: -100, opacity: 0.3 }}
                     transition={{ opacity: { delay: 2, duration: 1 }, strokeDashoffset: { duration: 3, repeat: Infinity, ease: 'linear'} }}
                   />
 
+                  {/* === OPS SUB-TEAM LINES === */}
                   {opsSubTeams.map((_, i) => {
-                    const startX = 250; const startY = 195;
-                    const endX = 130 + i * 120; const endY = 260;
+                    const startX = VP_OPS.x + 90; const startY = VP_OPS.y + 55;
+                    const endX = 80 + i * 130; const endY = 310;
                     return (
                       <motion.g key={`ops-line-${i}`}>
                         <motion.line
                           x1={startX} y1={startY} x2={endX} y2={endY}
                           stroke="rgba(255,255,255,0.08)" strokeWidth={1}
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                          transition={{ duration: 0.6, delay: 1.2 + i * 0.1, ease: appleEase }}
+                          transition={{ duration: 0.6, delay: 1.4 + i * 0.1, ease: appleEase }}
                           style={{ opacity: isAcadHovered ? 0.02 : 1, transition: 'opacity 0.3s' }}
                         />
                         <motion.circle
@@ -242,16 +306,17 @@ export default function SlideArchitecture({ isActive }) {
                     )
                   })}
 
+                  {/* === ACAD SUB-TEAM LINES === */}
                   {acadSubTeams.map((_, i) => {
-                    const startX = 650; const startY = 195;
-                    const endX = 530 + i * 120; const endY = 260;
+                    const startX = ACAD_DIR.x - 90; const startY = ACAD_DIR.y + 55;
+                    const endX = 560 + i * 130; const endY = 310;
                     return (
                       <motion.g key={`acad-line-${i}`}>
                         <motion.line
                           x1={startX} y1={startY} x2={endX} y2={endY}
                           stroke="rgba(141,74,232,0.15)" strokeWidth={1}
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                          transition={{ duration: 0.6, delay: 1.2 + i * 0.1, ease: appleEase }}
+                          transition={{ duration: 0.6, delay: 1.4 + i * 0.1, ease: appleEase }}
                           style={{ opacity: isOpsHovered ? 0.02 : 1, transition: 'opacity 0.3s' }}
                         />
                         <motion.circle
@@ -269,8 +334,9 @@ export default function SlideArchitecture({ isActive }) {
             </AnimatePresence>
           </svg>
 
-          {/* HTML NODES OVERLAY FOR PERFECT MORPHING */}
+          {/* HTML NODES OVERLAY */}
           <div className="absolute inset-0 z-20">
+            {/* PHASE 0-1: Legacy nodes */}
             <AnimatePresence>
               {phase < 2 && (
                 [
@@ -306,15 +372,18 @@ export default function SlideArchitecture({ isActive }) {
               )}
             </AnimatePresence>
 
+            {/* PHASE 3: AIRIS 2.0 Nodes */}
             <AnimatePresence>
               {phase === 3 && (
                 <>
-                  {/* President Core */}
+                  {/* ═══ EXECUTIVE CORE ═══ */}
+
+                  {/* President */}
                   <motion.div
                     layoutId="node-core"
                     className="absolute rounded-xl flex flex-col items-center justify-center"
                     style={{
-                      left: 350, top: 10, width: 200, height: 60,
+                      left: PRESIDENT.x - 100, top: PRESIDENT.y, width: 200, height: 60,
                       background: 'rgba(181,90,199,0.12)',
                       border: '1.5px solid #B55AC7',
                       boxShadow: '0 0 20px rgba(181,90,199,0.15)',
@@ -327,23 +396,23 @@ export default function SlideArchitecture({ isActive }) {
                     <span className="font-inter text-[11px] text-[#B55AC7] uppercase tracking-wider mt-0.5">AIRIS Core</span>
                   </motion.div>
 
-                  {/* VP Operations */}
+                  {/* Vice President */}
                   <motion.div
                     layoutId="node-ops-pillar"
                     className="absolute rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300"
                     style={{
-                      left: 160, top: 140, width: 180, height: 55,
+                      left: VP_OPS.x, top: VP_OPS.y, width: 180, height: 55,
                       background: 'rgba(255,255,255,0.03)',
                       border: '1px solid rgba(163,163,163,0.3)',
                       boxShadow: isOpsHovered ? '0 0 16px rgba(163,163,163,0.15)' : 'none',
                     }}
                     initial={{ opacity: 0, x: 60, y: -20 }}
                     animate={{ opacity: 1, x: 0, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.8, ease: appleEase }}
+                    transition={{ duration: 0.8, delay: 0.6, ease: appleEase }}
                     onMouseEnter={() => setHoveredNode('ops')}
                     onMouseLeave={() => setHoveredNode(null)}
                   >
-                    <span className="font-space font-semibold text-[15px] text-white">VP Operations</span>
+                    <span className="font-space font-semibold text-[14px] text-white">Vice President</span>
                     <span className="font-inter text-[11px] text-[#A3A3A3] mt-0.5">Operations Pillar</span>
                   </motion.div>
 
@@ -352,25 +421,45 @@ export default function SlideArchitecture({ isActive }) {
                     layoutId="node-acad-pillar"
                     className="absolute rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300"
                     style={{
-                      left: 560, top: 140, width: 180, height: 55,
+                      left: ACAD_DIR.x - 180, top: ACAD_DIR.y, width: 180, height: 55,
                       background: 'rgba(255,255,255,0.03)',
                       border: '1px solid rgba(141,74,232,0.4)',
                       boxShadow: isAcadHovered ? '0 0 16px rgba(141,74,232,0.25)' : 'none',
                     }}
                     initial={{ opacity: 0, x: -60, y: -20 }}
                     animate={{ opacity: 1, x: 0, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.8, ease: appleEase }}
+                    transition={{ duration: 0.8, delay: 0.6, ease: appleEase }}
                     onMouseEnter={() => setHoveredNode('acad')}
                     onMouseLeave={() => setHoveredNode(null)}
                   >
-                    <span className="font-space font-semibold text-[15px] text-white">Academic Director</span>
+                    <span className="font-space font-semibold text-[14px] text-white">Academic Director</span>
                     <span className="font-inter text-[11px] text-[#8D4AE8] opacity-80 mt-0.5">Academic Pillar</span>
                   </motion.div>
 
-                  {/* Ops Sub-teams */}
+                  {/* Secretary — Communication Hub */}
+                  <motion.div
+                    className="absolute rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300"
+                    style={{
+                      left: SECRETARY.x - 95, top: SECRETARY.y, width: 190, height: 50,
+                      background: isSecHovered ? 'rgba(181,90,199,0.06)' : 'rgba(181,90,199,0.025)',
+                      border: '1px solid rgba(181,90,199,0.2)',
+                      boxShadow: isSecHovered ? '0 0 20px rgba(181,90,199,0.12)' : 'none',
+                      borderStyle: 'dashed',
+                    }}
+                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.8, delay: 0.6, ease: appleEase }}
+                    onMouseEnter={() => setHoveredNode('sec')}
+                    onMouseLeave={() => setHoveredNode(null)}
+                  >
+                    <span className="font-space font-semibold text-[13px] text-white">Secretary</span>
+                    <span className="font-inter text-[10px] text-[#B55AC7] opacity-70 mt-0.5">Executive Coordination</span>
+                  </motion.div>
+
+                  {/* ═══ OPS SUB-TEAMS ═══ */}
                   {opsSubTeams.map((team, i) => {
-                    const endX = 130 + i * 120
-                    const endY = 260
+                    const endX = 80 + i * 130
+                    const endY = 310
                     return (
                       <motion.div
                         key={`ops-div-${i}`}
@@ -393,10 +482,10 @@ export default function SlideArchitecture({ isActive }) {
                     )
                   })}
 
-                  {/* Acad Sub-teams */}
+                  {/* ═══ ACAD SUB-TEAMS ═══ */}
                   {acadSubTeams.map((team, i) => {
-                    const endX = 530 + i * 120
-                    const endY = 260
+                    const endX = 560 + i * 130
+                    const endY = 310
                     return (
                       <motion.div
                         key={`acad-div-${i}`}

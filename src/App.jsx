@@ -17,7 +17,6 @@ import SlideAcademic from './components/slides/SlideAcademic.jsx'
 import SlideAccountability from './components/slides/SlideAccountability.jsx'
 import SlideRoadmap from './components/slides/SlideRoadmap.jsx'
 import SlideResearch from './components/slides/SlideResearch.jsx'
-import SlideRecruitment from './components/slides/SlideRecruitment.jsx'
 import SlideVision from './components/slides/SlideVision.jsx'
 import SlideClosing from './components/slides/SlideClosing.jsx'
 
@@ -35,7 +34,6 @@ const slides = [
   SlideAccountability,
   SlideRoadmap,
   SlideResearch,
-  SlideRecruitment,
   SlideVision,
   SlideClosing,
 ]
@@ -55,7 +53,7 @@ export default function App() {
   }, [])
 
   // Dynamic ambient layer controls
-  const particleDensity = currentSlide === 12 ? 1.5 : 1
+  const particleDensity = currentSlide === 11 ? 1.5 : 1
   const particleOpacity = currentSlide === 0 ? 0.6 : 1
 
   return (

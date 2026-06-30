@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-const TOTAL_SLIDES = 14
+const TOTAL_SLIDES = 13
 
 export function useSlideNavigation() {
   const [currentSlide, setCurrentSlide] = useState(0)
